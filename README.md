@@ -114,6 +114,8 @@ Those keys are documented and configurable in Matchminer API repository, in [`ma
 
 The keys written to a patient's genomic JSON file are currently specified only in the AI prompt `get_ai_prompt_for_patient_genomic_criteria` in `utils/ai_helper.py`.
 
+At the time of this documentation, free-text diagnosis is converted to an OncoTree value with an LLM using OncoTree version `oncotree_2025_10_03`.
+
 ---
 
 ## 6. Deployment (Production on Linux)
