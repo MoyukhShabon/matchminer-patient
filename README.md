@@ -103,7 +103,22 @@ The application is designed around a simple, user-centric workflow:
 
 ---
 
-## 5. Deployment (Production on Linux)
+## 5. Patient data schema
+
+The values in `patient_schema_keys` (`patient_data/patient_data_config.py`) are the keys the Matchminer application accepts for a patient's clinical data.
+
+Those keys are documented and configurable in Matchminer API repository, in [`matchminer-api/matchminer/data_model.py`]:
+
+*   **`clinical_schema`** — patient's clinical schema
+*   **`genomic_schema`** — patient's genomic schema
+
+The keys written to a patient's genomic JSON file are currently specified only in the AI prompt `get_ai_prompt_for_patient_genomic_criteria` in `utils/ai_helper.py`.
+
+At the time of this documentation, free-text diagnosis is converted to an OncoTree value with an LLM using OncoTree version `oncotree_2025_10_03`.
+
+---
+
+## 6. Deployment (Production on Linux)
 
 To deploy this application to a production Linux server, we recommend using a combination of **Gunicorn** and **Nginx**.
 
@@ -172,7 +187,7 @@ Remember to also configure your firewall (`ufw`) to allow traffic on port specif
 
 ---
 
-## 6. Troubleshooting & Additional Setup
+## 7. Troubleshooting & Additional Setup
 
 ### A. Permissions for Home Directory
 If your project (and the Gunicorn socket or static files) are inside your home directory, nginx (which runs as the `www-data` user) must be able to traverse your home directory. Set the execute permission for others:
@@ -193,4 +208,5 @@ Repeat the last command for any other static files you want to serve.
 ### C. Common Errors
 - **502 Bad Gateway:** Usually means nginx cannot connect to Gunicorn. Check that Gunicorn is running, the socket path matches, and permissions are correct.
 - **403 Forbidden on static files:** Means nginx cannot read the file or directory. Check and set the permissions as above.
+- **New static file returns 403:** Files created under the lab umask are often `640`, so nginx (`nobody`/`www-data`) cannot read them even though Flask/Gunicorn (running as your user) can. After adding anything under `static/`, run `chmod o+r` on the new file (and `chmod o+rx` on any new directory), then hard-refresh the browser.
 - **nginx config not loading:** Make sure your config is in `/etc/nginx/sites-available/` and symlinked to `/etc/nginx/sites-enabled/`, and that `/etc/nginx/nginx.conf` includes the line `include /etc/nginx/sites-enabled/*;`.
